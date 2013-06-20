@@ -5,7 +5,7 @@ youtube-dl (supposing it's installed on the machine). It then prompts the user
 what links he wants to store, and downloads them.
 
 ## TODO
-- Analysis of the links file
+- Analysis of the links file [IN-PROGRESS]
 - Download of links content
 
 ### Notes
