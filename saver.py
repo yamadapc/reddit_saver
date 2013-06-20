@@ -29,8 +29,6 @@ def main():
         print '\nSomething went wrong... Sorry'
         raise
         return 1
-    finally:
-        print '[DONE]'.rjust(80)
 
     # write saved links to a file
     try:
@@ -40,8 +38,6 @@ def main():
         print '\nSomething went wrong... Sorry'
         raise
         return 2
-    finally:
-        print '[DONE]'.rjust(78)
 
     # analyse file and prompt user for download selections [TODO]
 
