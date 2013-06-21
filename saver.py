@@ -3,18 +3,6 @@ import time
 import reddit
 from reddit.objects import Redditor, Submission
 
-sites = ('imgur', 'youtube',)
-
-class saved():
-    def __init__(self, title = '', url = ''):
-        self.title = title
-        self.url = url
-        for s in sites:
-            if s in self.url:
-                self.site = s
-                return
-        self.site = 'unknown'
-
 def write_queue(queue):
     output_file = open('links', 'w')
     for link in queue:
@@ -38,8 +26,8 @@ def main():
             queue.append(link)
             save_count += 1
     except:
-        print '\nSomething went wrong... Sorry'
         raise
+        print '\nSomething went wrong... Sorry'
         return 1
 
     # write saved links to a file
@@ -47,25 +35,28 @@ def main():
         print 'Writing links to file...'
         write_queue(queue)
     except:
-        print '\nSomething went wrong... Sorry'
         raise
+        print '\nSomething went wrong... Sorry'
         return 2
     finally:
         print 'Recognized and wrote %d links.' % save_count
 
-    # analyse file and prompt user for download selections
+    # analyse links
     l_by_sites = { 'imgur': 0, 'youtube': 0, 'unknown': 0,}
-    links_file = open('links', 'r')
-    lines = links_file.readlines()
+    site_of = {}
+    for link in queue:
+        site_of[link.url] = 'unknown'
+        for site in l_by_sites:
+            if site in link.url:
+                site_of[link.url] = site
 
-    for i in range(0, len(lines), 3):
-        link = saved(lines[i], lines[i+1])
-        l_by_sites[link.site] += 1
+    for site in site_of.values():
+       l_by_sites[site] += 1
 
     print 'I found',
     for site, nl in l_by_sites.items():
         print '%d %s links' % (nl, site),
-    links_file.close()
+    print
 
     return 0
 
