@@ -58,6 +58,12 @@ def main():
         print '%d %s links' % (nl, site),
     print
 
+    # ask user what to do
+    what_to_do = raw_input('\
+Type the sites you want me to retrieve from, \
+i for all retrievable images or \
+v for all retrievable videos: ')
+
     return 0
 
 if __name__ == '__main__':
