@@ -1,7 +1,6 @@
 import sys
 import time
 import reddit
-from reddit.objects import Redditor, Submission
 
 def write_queue(queue):
     output_file = open('links', 'w')
