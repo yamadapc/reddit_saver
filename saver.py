@@ -1,6 +1,8 @@
+import os
 import sys
 import time
 import reddit
+from urllib2 import urlopen, URLError, HTTPError
 
 def write_queue(queue):
     output_file = open('links', 'w')
@@ -9,6 +11,37 @@ def write_queue(queue):
         output_file.write(link.url + '\n')
         output_file.write('-'*79 + '\n')
     output_file.close()
+
+def retrieve(do, queue):
+    if not os.path.exists('downloads'):
+        print 'Downloads directory doesn\'t exists, creating it'
+        os.makedirs('downloads')
+
+    if do == 'imgur':
+        retrieving = [link for link in queue if 'imgur' in link.url]
+        for link in retrieving:
+            # case 1 - link already points to the image
+            if 'i.imgur.com' in link.url:
+                print 'Downloading', link.title
+                # find out extension - right now I have no idea on how to do it
+                # for all possible cases
+                if 'gif' in link.url:
+                    ext = '.gif'
+                else:
+                    ext = '.jpg'
+                # download
+                download_file(link.url, 'downloads/'+link.title+ext)
+
+def download_file(url, name):
+    try:
+        f = urlopen(url)
+        # write to local file
+        with open(name, 'wb') as local_f:
+            local_f.write(f.read())
+    except HTTPError, e:
+        print 'HTTPError', e.code, url
+    except URLError, e:
+        print 'URLError:', e.reason, url
 
 def main():
     # api setup
@@ -61,7 +94,9 @@ def main():
     what_to_do = raw_input('\
 Type the sites you want me to retrieve from, \
 i for all retrievable images or \
-v for all retrievable videos: ')
+v for all retrievable videos: ').split()
+    for do in what_to_do:
+        retrieve(do, queue)
 
     return 0
 
