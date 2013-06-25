@@ -77,15 +77,9 @@ def main():
         return 1
 
     # write saved links to a file
-    try:
-        print 'Writing links to file...'
-        write_queue(queue)
-    except:
-        raise
-        print '\nSomething went wrong... Sorry'
-        return 2
-    finally:
-        print 'Recognized and wrote %d links.' % len(queue)
+    print 'Writing links to file...'
+    write_queue(queue)
+    print 'Recognized and wrote %d links.' % len(queue)
 
     # analyse links
     l_by_sites = { 'imgur': 0, 'youtube': 0, 'unknown': 0,}
