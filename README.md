@@ -1,12 +1,11 @@
 # Reddit Saver
 The idea is that *Reddit Saver* reads your reddit saved posts, fetches their
-content links down, and figures if it could download it using wget or
-youtube-dl (supposing it's installed on the machine). It then prompts the user
-what links he wants to store, and downloads them.
+content links down, and figures if it could download them. 
+It then prompts the user what links he wants to store, and downloads them.
 
 ## TODO
 - Analysis of the links file [IN-PROGRESS]
-- Download of links content
+- Download of links content [IN-PROGRESS]
 
 ### Notes
 This was partially derived from [Sadiq Al-Khalili upvote downvote bot script](http://www.sadiqk.com/reddit-upvotedownvote-bot/). 
