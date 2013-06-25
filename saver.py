@@ -18,8 +18,7 @@ def retrieve(do, queue):
         os.makedirs('downloads')
 
     if do == 'imgur':
-        retrieving = [link for link in queue if 'imgur' in link.url]
-        c_link = 1
+        retrieving, c_link = [link for link in queue if 'imgur' in link.url], 1
         for link in retrieving:
             print 'Get:%d' % (c_link),
             # case 1 - link already points to the image
@@ -66,14 +65,12 @@ def main():
     api.login()
     # saved links and num of saved links
     queue = []
-    save_count = 0
 
     # read saved links from reddit
     try:
         print 'Reading saved links...'
         for link in api.get_saved_links(10):
             queue.append(link)
-            save_count += 1
     except:
         raise
         print '\nSomething went wrong... Sorry'
@@ -88,7 +85,7 @@ def main():
         print '\nSomething went wrong... Sorry'
         return 2
     finally:
-        print 'Recognized and wrote %d links.' % save_count
+        print 'Recognized and wrote %d links.' % len(queue)
 
     # analyse links
     l_by_sites = { 'imgur': 0, 'youtube': 0, 'unknown': 0,}
