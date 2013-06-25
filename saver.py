@@ -29,6 +29,9 @@ def retrieve(do, queue):
                 print '%s %s' % (link.url, link.title)
                 # find out extension
                 ext = url_extension(link.url)
+                # if the file exists, skip it
+                if os.path.isfile('downloads/%s.%s' % (link.title, ext)):
+                    continue
                 # download
                 urlretrieve(link.url, 'downloads/%s.%s' % (link.title, ext),
                             reporthook = dl_progress)
@@ -38,6 +41,9 @@ def retrieve(do, queue):
                 # transform the link to point at the zip
                 i = link.url.index(':') + 3
                 link.url = 'http://s.%s/zip' % link.url[i:]
+                # if the file exists, skip it
+                if os.path.isfile('downloads/%s.zip' % link.title):
+                    continue
                 # download zip
                 urlretrieve(link.url, 'downloads/%s.zip' % link.title,
                             reporthook = dl_progress)
@@ -49,6 +55,10 @@ def retrieve(do, queue):
                 link.url = 'http://imgur.com/download/%s' % link.url[-i:]
                 # find out extension 
                 ext = url_extension(link.url)
+                # if the file exists, skip it
+                if os.path.isfile('downloads/%s.%s' % (link.title, ext)):
+                    continue
+                # download
                 urlretrieve(link.url, 'downloads/%s.%s' % (link.title, ext), 
                             reporthook = dl_progress)
             else:
