@@ -2,7 +2,7 @@ import os
 import sys
 import time
 import reddit
-from urllib2 import urlopen, URLError, HTTPError
+from urllib import urlretrieve
 
 def write_queue(queue):
     output_file = open('links', 'w')
@@ -18,8 +18,11 @@ def retrieve(do, queue):
         os.makedirs('downloads')
 
     if do == 'imgur':
-        retrieving, c_link = [link for link in queue if 'imgur' in link.url], 1
+        retrieving = [link for link in queue if 'imgur' in link.url]
+        c_link = errors = 0
         for link in retrieving:
+            c_link += 1
+            print ' '*80+'\r',
             print 'Get:%d' % (c_link),
             # case 1 - link already points to the image
             if 'i.imgur.com' in link.url:
@@ -31,7 +34,8 @@ def retrieve(do, queue):
                 else:
                     ext = '.jpg'
                 # download
-                download_file(link.url, 'downloads/%s%s' % (link.title, ext))
+                urlretrieve(link.url, 'downloads/%s%s' % (link.title, ext),
+                            reporthook = dl_progress)
             # case 2 - link points to an album
             elif '/a/' in link.url:
                 print '%s [%s] (album)' % (link.url, link.title)
@@ -42,22 +46,19 @@ def retrieve(do, queue):
                 except:
                     print 'Error: %s probably is an invalid link' % link.url
                 # download zip
-                download_file(link.url, 'downloads/%s.zip' % link.title)
+                urlretrieve(link.url, 'downloads/%s.zip' % link.title,
+                            reporthook = dl_progress)
             else:
-                print '\rError:%d' % (c_link),
-                print '%s [%s]' % (link.url, link.title)
-            c_link += 1
+                print ' '*80+'\r',
+                print 'Error:%d %s [%s]' % (c_link, link.url, link.title)
+                errors += 1
+        print ' '*80+'\r',
+        print 'Fetched %d imgur links successfully.' % (c_link - errors)
 
-def download_file(url, name):
-    try:
-        f = urlopen(url)
-        # write to local file
-        with open(name, 'wb') as local_f:
-            local_f.write(f.read())
-    except HTTPError, e:
-        print 'HTTPError:', e.code, url
-    except URLError, e:
-        print 'URLError:', e.reason, url
+def dl_progress(count, blockSize, totalSize):
+    percent = int(count*blockSize*100/totalSize)
+    sys.stdout.write('\r%2d%% [%d/%d]' % (percent, count*blockSize, totalSize))
+    sys.stdout.flush()
 
 def main():
     # api setup
