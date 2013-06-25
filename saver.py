@@ -5,11 +5,11 @@ import reddit
 from urllib import urlretrieve, urlopen
 
 def write_queue(queue):
-    output_file = open('links', 'w')
+    output_file = open('links.markdown', 'w')
     for link in queue:
-        output_file.write(link.__unicode__() + '\n')
-        output_file.write(link.url + '\n')
-        output_file.write('-'*79 + '\n')
+        output_file.write('# %s\n' % link.__unicode__())
+        output_file.write('<%s>\n' % link.url)
+        output_file.write('* * *\n\n')
     output_file.close()
 
 def retrieve(do, queue):
