@@ -14,15 +14,17 @@ def write_queue(queue):
 
 def retrieve(do, queue):
     if not os.path.exists('downloads'):
-        print 'Downloads directory doesn\'t exists, creating it'
+        print 'Downloads directory doesn\'t exists, creating it...'
         os.makedirs('downloads')
 
     if do == 'imgur':
         retrieving = [link for link in queue if 'imgur' in link.url]
+        c_link = 1
         for link in retrieving:
+            print 'Get:%d' % (c_link),
             # case 1 - link already points to the image
             if 'i.imgur.com' in link.url:
-                print 'Downloading', link.title
+                print '%s [%s]' % (link.url, link.title)
                 # find out extension - right now I have no idea on how to do it
                 # for all possible cases
                 if 'gif' in link.url:
@@ -30,7 +32,22 @@ def retrieve(do, queue):
                 else:
                     ext = '.jpg'
                 # download
-                download_file(link.url, 'downloads/'+link.title+ext)
+                download_file(link.url, 'downloads/%s%s' % (link.title, ext))
+            # case 2 - link points to an album
+            elif '/a/' in link.url:
+                print '%s [%s] (album)' % (link.url, link.title)
+                # transform the link to point at the zip
+                try:
+                    i = link.url.index(':') + 3
+                    link.url = 'http://s.%s/zip' % link.url[i:]
+                except:
+                    print 'Error: %s probably is an invalid link' % link.url
+                # download zip
+                download_file(link.url, 'downloads/%s.zip' % link.title)
+            else:
+                print '\rError:%d' % (c_link),
+                print '%s [%s]' % (link.url, link.title)
+            c_link += 1
 
 def download_file(url, name):
     try:
@@ -39,7 +56,7 @@ def download_file(url, name):
         with open(name, 'wb') as local_f:
             local_f.write(f.read())
     except HTTPError, e:
-        print 'HTTPError', e.code, url
+        print 'HTTPError:', e.code, url
     except URLError, e:
         print 'URLError:', e.reason, url
 
@@ -85,7 +102,7 @@ def main():
     for site in site_of.values():
        l_by_sites[site] += 1
 
-    print 'I found',
+    print 'I\'ve found',
     for site, nl in l_by_sites.items():
         print '%d %s links' % (nl, site),
     print
