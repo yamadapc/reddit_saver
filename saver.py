@@ -2,7 +2,7 @@ import os
 import sys
 import time
 import reddit
-from urllib import urlretrieve
+from urllib import urlretrieve, urlopen
 
 def write_queue(queue):
     output_file = open('links', 'w')
@@ -27,26 +27,29 @@ def retrieve(do, queue):
             # case 1 - link already points to the image
             if 'i.imgur.com' in link.url:
                 print '%s [%s]' % (link.url, link.title)
-                # find out extension - right now I have no idea on how to do it
-                # for all possible cases
-                if 'gif' in link.url:
-                    ext = '.gif'
-                else:
-                    ext = '.jpg'
+                # find out extension
+                ext = url_extension(link.url)
                 # download
-                urlretrieve(link.url, 'downloads/%s%s' % (link.title, ext),
+                urlretrieve(link.url, 'downloads/%s.%s' % (link.title, ext),
                             reporthook = dl_progress)
             # case 2 - link points to an album
             elif '/a/' in link.url:
                 print '%s [%s] (album)' % (link.url, link.title)
                 # transform the link to point at the zip
-                try:
-                    i = link.url.index(':') + 3
-                    link.url = 'http://s.%s/zip' % link.url[i:]
-                except:
-                    print 'Error: %s probably is an invalid link' % link.url
+                i = link.url.index(':') + 3
+                link.url = 'http://s.%s/zip' % link.url[i:]
                 # download zip
                 urlretrieve(link.url, 'downloads/%s.zip' % link.title,
+                            reporthook = dl_progress)
+            # case 3 - link points to imgur page
+            elif 'imgur.com/' in link.url:
+                print '%s [%s]' % (link.url, link.title)
+                # transform the link to point at the image
+                i = link.url[-1::-1].index('/')
+                link.url = 'http://imgur.com/download/%s' % link.url[-i:]
+                # find out extension 
+                ext = url_extension(link.url)
+                urlretrieve(link.url, 'downloads/%s.%s' % (link.title, ext), 
                             reporthook = dl_progress)
             else:
                 print ' '*80+'\r',
@@ -59,6 +62,12 @@ def dl_progress(count, blockSize, totalSize):
     percent = int(count*blockSize*100/totalSize)
     sys.stdout.write('\r%2d%% [%d/%d]' % (percent, count*blockSize, totalSize))
     sys.stdout.flush()
+
+def url_extension(url):
+    f = urlopen(url)
+    ext = f.info().type
+    ext = ext[ext.index('/') + 1:]
+    return ext
 
 def main():
     # api setup
