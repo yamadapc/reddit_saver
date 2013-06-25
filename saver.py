@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import reddit
+from re import escape
 from urllib import urlretrieve, urlopen
 
 def write_queue(queue):
@@ -91,6 +92,7 @@ def main():
         print 'Reading saved links...'
         for link in api.get_saved_links(None):
             link.title = '[%s]' % link.title
+            link.title = link.title.replace('/', '-') # escapes names with '/'
             queue.append(link)
     except:
         raise
