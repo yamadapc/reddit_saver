@@ -26,7 +26,7 @@ def retrieve(do, queue):
             print 'Get:%d' % (c_link),
             # case 1 - link already points to the image
             if 'i.imgur.com' in link.url:
-                print '%s [%s]' % (link.url, link.title)
+                print '%s %s' % (link.url, link.title)
                 # find out extension
                 ext = url_extension(link.url)
                 # download
@@ -34,7 +34,7 @@ def retrieve(do, queue):
                             reporthook = dl_progress)
             # case 2 - link points to an album
             elif '/a/' in link.url:
-                print '%s [%s] (album)' % (link.url, link.title)
+                print '%s %s (album)' % (link.url, link.title)
                 # transform the link to point at the zip
                 i = link.url.index(':') + 3
                 link.url = 'http://s.%s/zip' % link.url[i:]
@@ -43,7 +43,7 @@ def retrieve(do, queue):
                             reporthook = dl_progress)
             # case 3 - link points to imgur page
             elif 'imgur.com/' in link.url:
-                print '%s [%s]' % (link.url, link.title)
+                print '%s %s' % (link.url, link.title)
                 # transform the link to point at the image
                 i = link.url[-1::-1].index('/')
                 link.url = 'http://imgur.com/download/%s' % link.url[-i:]
@@ -53,7 +53,7 @@ def retrieve(do, queue):
                             reporthook = dl_progress)
             else:
                 print ' '*80+'\r',
-                print 'Error:%d %s [%s]' % (c_link, link.url, link.title)
+                print 'Error:%d %s %s' % (c_link, link.url, link.title)
                 errors += 1
         print ' '*80+'\r',
         print 'Fetched %d imgur links successfully.' % (c_link - errors)
@@ -79,7 +79,8 @@ def main():
     # read saved links from reddit
     try:
         print 'Reading saved links...'
-        for link in api.get_saved_links(10):
+        for link in api.get_saved_links(None):
+            link.title = '[%s]' % link.title
             queue.append(link)
     except:
         raise
