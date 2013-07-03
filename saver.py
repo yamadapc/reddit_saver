@@ -1,12 +1,57 @@
+"""Reddit Saver
+
+Usage: 
+  saver.py
+  saver.py -u <user> [-p <password>]
+  saver.py -o <output> | [-l <links>]
+  saver.py -h | --help
+
+Fetch saved posts links or read them from a file and try to download their
+content.
+
+Arguments:
+  -u --user <user>           specify username
+  -p --password <password>   specify password (not recomended)
+  -l --links <links>         read links from file [default: ./links.markdown]
+  -o --output_file <output>  write links to file [default: ./links.markdown]
+
+Options:
+  -h --help                show this screen
+
+"""
+
 import os
 import sys
 import time
 import reddit
+import getpass
 from re import escape
 from urllib import urlretrieve, urlopen
+from docopt import docopt
 
-def write_queue(queue):
-    output_file = open('links.markdown', 'w')
+def get_queue(username = None, password = None):
+    # api setup
+    api = reddit.Reddit(user_agent='saver')
+    api.login(username, password)
+    # saved links and num of saved links
+    queue = []
+
+    # read saved links from reddit
+    try:
+        print 'Reading saved links...'
+        for link in api.get_saved_links(None):
+            link.title = '[%s]' % link.title
+            link.title = link.title.replace('/', '-') # escapes names with '/'
+            queue.append(link)
+    except:
+        raise
+        print '\nSomething went wrong... Sorry'
+        return 1
+
+    return queue
+
+def write_queue(queue, output_file_name):
+    output_file = open(output_file_name, 'w')
     for link in queue:
         output_file.write('# %s\n' % link.__unicode__())
         output_file.write('<%s>\n' % link.url)
@@ -75,28 +120,33 @@ def url_extension(url):
     return ext
 
 def main():
-    # api setup
-    api = reddit.Reddit(user_agent='saver')
-    api.login()
-    # saved links and num of saved links
-    queue = []
+    # get arguments
+    arguments = docopt(__doc__)
+    user = arguments['<user>']
+    password = arguments['<password>']
+    links_file_name = arguments['<links>']
+    output_file_name = arguments['<output>']
 
-    # read saved links from reddit
-    try:
-        print 'Reading saved links...'
-        for link in api.get_saved_links(None):
-            link.title = '[%s]' % link.title
-            link.title = link.title.replace('/', '-') # escapes names with '/'
-            queue.append(link)
-    except:
-        raise
-        print '\nSomething went wrong... Sorry'
-        return 1
+    # ask for the password if username was provided without it
+    if user and not password:
+        print 'Username: %s' % user
+        password = getpass.getpass('Password for %s: ' % user)
 
-    # write saved links to a file
-    print 'Writing links to file...'
-    write_queue(queue)
-    print 'Recognized and wrote %d links.' % len(queue)
+    if not links_file_name: links_file_name = 'links.markdown'
+    if not output_file_name: output_file_name = 'links.markdown'
+
+    # fetch queue from reddit
+    if not arguments['-l']:
+        queue = get_queue(user, password)
+
+        # write saved links to a file
+        print 'Writing links to %s...' % output_file_name
+        write_queue(queue, output_file_name)
+        print 'Recognized and wrote %d links.' % len(queue)
+    # fetch queue from file
+    else:
+        print 'This option is still under development, sorry...'
+        return -1
 
     # analyse links
     l_by_sites = { 'imgur': 0, 'youtube': 0, 'unknown': 0,}
