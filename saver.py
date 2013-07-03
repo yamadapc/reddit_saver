@@ -63,6 +63,8 @@ def retrieve(do, queue):
 
 def dl_progress(count, blockSize, totalSize):
     percent = int(count*blockSize*100/totalSize)
+    totalSize /= 1000
+    blockSize /= 1000
     sys.stdout.write('\r%2d%% [%d/%d]' % (percent, count*blockSize, totalSize))
     sys.stdout.flush()
 
