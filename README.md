@@ -11,3 +11,6 @@ It then prompts the user what links he wants to store, and downloads them.
 This was partially derived from [Sadiq Al-Khalili upvote downvote bot script](http://www.sadiqk.com/reddit-upvotedownvote-bot/). 
 And requires mellorts' [reddit\_api](https://github.com/mellort/reddit_api).
 Further usage notes will be added as the program gains any use. **lol**
+
+## Donations
+Would you like to buy me a beer? Send bitcoin to 3JjxJydvoJjTrhLL86LGMc8cNB16pTAF3y
